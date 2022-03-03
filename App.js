@@ -1,13 +1,51 @@
-import { StatusBar } from 'expo-status-bar';
+import React, {useState,useRef} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Draw, DrawRef } from "@benjeau/react-native-draw";
+
+import * as Font from 'expo-font';
+import AppLoading from 'expo-app-loading'; 
+
+import Navigation from './navigation/Navigation';
+
+const fetchFonts = () => {
+  return Font.loadAsync({ //폰트 로드
+    'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+    'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
+  }); 
+}
 
 export default function App() {
+  const [fontLoaded, setfontLoaded] = useState(false);
+
+  if (!fontLoaded) { //이게 다 실행이 되어야 메인 화면이 나옴. 폰트를 로딩하는거
+    return ( 
+      <AppLoading 
+        startAsync={fetchFonts} 
+        onFinish={() => setfontLoaded(true)}
+        onError={(err) => console.log(err)}
+      />
+    );
+  }; 
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <Navigation />
   );
+
+  // return (
+  //   <Draw
+  //     ref={drawRef}
+  //     height={400}
+  //     width={300}
+  //     initialValues={{
+  //       color: "#B644D0",
+  //       thickness: 10,
+  //       opacity: 0.5,
+  //       paths: []
+  //     }}
+  //     brushPreview="none"
+  //     canvasStyle={{ elevation: 0, backgroundColor: "red" }}
+  //   />
+  // )
 }
 
 const styles = StyleSheet.create({
