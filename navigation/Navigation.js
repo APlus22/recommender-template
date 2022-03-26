@@ -17,6 +17,7 @@ import Colors from '../constants/colors';
 import FolderScreen from '../screens/folder';
 import MainScreen from '../screens/main';
 import TestScreen from '../screens/test';
+import TemplateScreen from '../screens/template';
 
 
 //메인탭(카드)의 스택 네비게이션
@@ -29,9 +30,19 @@ const testStack = createStackNavigator({
     Test: TestScreen,
 });
 
+const drawingStack=  createStackNavigator({ 
+    Drawing: MainScreen,
+});
+
+const TemplateStack = createStackNavigator({ 
+    Template: TemplateScreen,
+});
+
 const Drawer = createDrawerNavigator({
     Main: MainStack,
     Test: testStack,
+    Drawing: drawingStack,
+    Template: TemplateStack,
 },
 {
     contentOptions: {

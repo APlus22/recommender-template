@@ -132,11 +132,15 @@ FolderScreen.navigationOptions = navData => {
                   title='Cart' 
                   iconName={Platform.OS === 'android' ? 'md-add' : 'ios-add'}
                   onPress={() => {
-                      navData.navigation.navigate({routeName: 'Main'})
+                    
+                      navData.navigation.navigate({routeName: 'Template'})
+                      
                   }}    
               />
           </HeaderButtons>
+          
       ),
+      
 
       headerLeft: () => (
           <HeaderButtons HeaderButtonComponent={HeaderButton}>

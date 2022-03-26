@@ -6,6 +6,9 @@ import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading'; 
 
 import Navigation from './navigation/Navigation';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 
 const fetchFonts = () => {
   return Font.loadAsync({ //폰트 로드
@@ -13,6 +16,8 @@ const fetchFonts = () => {
     'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
   }); 
 }
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontLoaded, setfontLoaded] = useState(false);
@@ -28,7 +33,9 @@ export default function App() {
   }; 
 
   return (
-      <Navigation />
+      <>
+        <Navigation /> 
+      </>
   );
 
   // return (
@@ -46,6 +53,8 @@ export default function App() {
   //     canvasStyle={{ elevation: 0, backgroundColor: "red" }}
   //   />
   // )
+
+  
 }
 
 const styles = StyleSheet.create({
