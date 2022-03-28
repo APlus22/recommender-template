@@ -134,6 +134,10 @@ const MainScreen = (props) =>  {
     const handleColorPurple = () => {
       ref.current.changePenColor("purple");
     }
+    const handleHighlighter = () => {
+      ref.current.changePenColor("rgba(255,212,0,0.1)")
+      ref.current.changePenSize(20,40);	
+    }
   
     const style = `
       .m-signature-pad{
@@ -166,6 +170,7 @@ const MainScreen = (props) =>  {
             <Button title="Big" onPress={handlePenSizeBig} />
             <Button title="Middle" onPress={handlePenSizeMid} />
             <Button title="Small" onPress={handlePenSizeSm} />
+            <Button title="Highlighter" onPress={handleHighlighter} />
           </View>
           <View style={styles.colorButton}>
             <TouchableOpacity style={{backgroundColor:"red", borderRadius:50, width: 100, height: 100}} onPress={handleColorRed}/>
@@ -235,7 +240,9 @@ else{
     ref.current.changePenColor("blue");
   }
   const handleColorPurple = () => {
+    //ref.current.backgroundColor = 'rgba(255,0,0,0.3)';
     ref.current.changePenColor("purple");
+    console.log(ref.current.changePenColor)
   }
 
   const style = `
