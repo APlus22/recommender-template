@@ -1,7 +1,7 @@
 import React from 'react';
-import {Text} from 'react-native';
+import { Text } from 'react-native';
 
-import { createStackNavigator} from 'react-navigation-stack'; //stack
+import { createStackNavigator } from 'react-navigation-stack'; //stack
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createAppContainer } from 'react-navigation'; //이거 이케 해줘야되네 따로
 
@@ -21,20 +21,20 @@ import TemplateScreen from '../screens/template';
 
 
 //메인탭(카드)의 스택 네비게이션
-const MainStack = createStackNavigator({ 
+const MainStack = createStackNavigator({
     folder: FolderScreen,
     Main: MainScreen,
 });
 
-const testStack = createStackNavigator({ 
+const testStack = createStackNavigator({
     Test: TestScreen,
 });
 
-const drawingStack=  createStackNavigator({ 
+const drawingStack = createStackNavigator({
     Drawing: MainScreen,
 });
 
-const TemplateStack = createStackNavigator({ 
+const TemplateStack = createStackNavigator({
     Template: TemplateScreen,
 });
 
@@ -44,10 +44,10 @@ const Drawer = createDrawerNavigator({
     Drawing: drawingStack,
     Template: TemplateStack,
 },
-{
-    contentOptions: {
-        activeTintColor: Colors.primaryColor
-    }
-});
+    {
+        contentOptions: {
+            activeTintColor: Colors.primaryColor
+        }
+    });
 
 export default createAppContainer(Drawer);

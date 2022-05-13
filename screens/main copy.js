@@ -1,10 +1,11 @@
 import React, { Component, useState, useRef } from 'react';
-import { StyleSheet, Text, View, Image, Button } from "react-native";
+import { SafeAreaView, PermissionsAndroid, Platform, StyleSheet, Text, View, Image, Button } from "react-native";
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Signature from "react-native-signature-canvas";
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
+import ViewShot from 'react-native-view-shot';
 
 const MainScreen = (props) => {
 
@@ -68,6 +69,38 @@ const MainScreen = (props) => {
     else {
       example = ""
     }
+
+    /* screen capture */
+    const captureRef = useRef();
+
+    const getPhotoUri = async (): Promise<string> => {
+      const uri = await captureRef.current.capture();
+      console.log('👂👂 Image saved to', uri);
+      return uri;
+    };
+
+    const hasAndroidPermission = async () => {
+      const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+      const hasPermission = await PermissionsAndroid.check(permission);
+      if (hasPermission) {
+        return true;
+      }
+
+      const status = await PermissionsAndroid.request(permission);
+      return status === 'granted';
+    };
+
+    const onSave = async () => {
+      if (Platform.OS === 'android' && !(await hasAndroidPermission())) {
+        toast('갤러리 접근 권한이 없어요');
+        return;
+      }
+
+      const uri = await getPhotoUri();
+      const result = await CameraRoll.save(uri);
+      console.log('🐤result', result);
+    };
 
 
 
@@ -159,6 +192,8 @@ const MainScreen = (props) => {
     return (
       <View style={{ flex: 1 }}>
 
+
+
         <Signature
           ref={ref}
           bgSrc={example}
@@ -166,23 +201,42 @@ const MainScreen = (props) => {
           bgHeight={imgHeight}
           // style={{resizeMode: 'contain', height: 600, width:408}} 
           style={{ resizeMode: 'contain' }}
-          onOK={handleOK}
+          onOK={onSave}
 
           confirmText="Save"
           webStyle={style}
 
         />
-        <View style={styles.paintController}>
+
+
+
+
+
+        <ViewShot ref={captureRef} options={{ format: 'jpg', quality: 0.9 }}>
+          <View style={styles.paintController}>
+            <Button title="Draw" onPress={handleDraw} style={{ backgroundColor: "white" }} />
+            <Button title="Erase" onPress={handleErase} />
+            <Button title="Undo" onPress={onSave} />
+            <Button title="Redo" onPress={handleRedo} />
+            <Button title="Clear" onPress={handleClear} />
+            <Button title="Big" onPress={handlePenSizeBig} />
+            <Button title="Middle" onPress={handlePenSizeMid} />
+            <Button title="Small" onPress={handlePenSizeSm} />
+            <Button title="Highlighter" onPress={handleHighlighter} />
+          </View>
+        </ViewShot>
+
+        {/* <View style={styles.paintController}>
           <Button title="Draw" onPress={handleDraw} style={{ backgroundColor: "white" }} />
           <Button title="Erase" onPress={handleErase} />
-          <Button title="Undo" onPress={handleUndo} />
+          <Button title="Undo" onPress={onSave} />
           <Button title="Redo" onPress={handleRedo} />
           <Button title="Clear" onPress={handleClear} />
           <Button title="Big" onPress={handlePenSizeBig} />
           <Button title="Middle" onPress={handlePenSizeMid} />
           <Button title="Small" onPress={handlePenSizeSm} />
           <Button title="Highlighter" onPress={handleHighlighter} />
-        </View>
+        </View> */}
         <View style={styles.colorButton}>
           <TouchableOpacity style={{ backgroundColor: "red", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorRed} />
           <TouchableOpacity style={{ backgroundColor: "orange", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorOrange} />
@@ -299,6 +353,7 @@ const MainScreen = (props) => {
             <Button title="Middle" onPress={handlePenSizeMid} />
             <Button title="Small" onPress={handlePenSizeSm} />
             <Button title="Highlighter" onPress={handleHighlighter} />
+
           </View>
           <View style={styles.colorButton}>
             <TouchableOpacity style={{ backgroundColor: "red", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorRed} />
