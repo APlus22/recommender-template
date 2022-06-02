@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Signature from "react-native-signature-canvas";
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainScreen = (props) => {
 
@@ -74,18 +74,36 @@ const MainScreen = (props) => {
     const imgHeight = 1200;
     const imgWidth = 900;
 
+    //개발 대안 조건
+    // 1. 템플릿 추천용 캔버스가 아닌 일반 캔버스에서 사용할 것 
+    // 2. 인공지능으로 돌리는 버튼 클릭 시 텍스트화 후 캔버스 없는 페이지로 이동
+    // 3. 그 페이지에 텍스트화 된 거 붙이기 
 
     const handleOK = async (signature) => {
-      console.log(signature);
-      setSign(signature);
-      const base64Code = signature.split("data:image/png;base64,")[1];
-      const filename = FileSystem.documentDirectory + "some_unique_file_name.png";
-      await FileSystem.writeAsStringAsync(filename, base64Code, {
-        encoding: FileSystem.EncodingType.Base64,
+      // console.log(signature);
+      // setSign(signature);
+      // const base64Code = signature.split("data:image/png;base64,")[1];
+      // const filename = FileSystem.documentDirectory + "some_unique_file_name.png";
+      // console.log("테스트 : ", FileSystem);
+      // await FileSystem.writeAsStringAsync(filename, base64Code, {
+      //   encoding: FileSystem.EncodingType.Base64,
+      // });
+
+      AsyncStorage.setItem('test_id', signature, () => { //test_id변수로 signature (base64) 저장
+        console.log('이미지 id저장')
       });
 
-      const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+      AsyncStorage.getItem('test_id', (err, result) => { //test_id에 담긴 아이디 불러오기
+        console.log(result); // result에 siganture 이미지 파일 담김 //불러온거 출력
+      });
 
+      //base64 파일 image로 불러오는 방법
+      // <Image
+      //     download
+      //     source={{
+      //       uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+      //     }}
+      //   />
     };
 
     const handleEmpty = () => {
@@ -112,15 +130,15 @@ const MainScreen = (props) => {
       ref.current.clearSignature();
     };
     const handlePenSizeBig = () => {
-      ref.current.changePenSize(1, 10)
+      ref.current.changePenSize(10, 10)
       //ref.current.clearSignature();
     };
     const handlePenSizeMid = () => {
-      ref.current.changePenSize(1, 5)
+      ref.current.changePenSize(5, 5)
       //ref.current.clearSignature();
     };
     const handlePenSizeSm = () => {
-      ref.current.changePenSize(1, 3)
+      ref.current.changePenSize(3, 3)
       //ref.current.clearSignature();
     };
     const handleColorRed = () => {
@@ -145,6 +163,12 @@ const MainScreen = (props) => {
       ref.current.changePenColor("rgba(255,212,0,0.1)")
       ref.current.changePenSize(20, 40);
     }
+    /*테스트*/
+    const handleConfirm = () => {
+      console.log("end");
+      const canvas2 = ref.current.readSignature();
+      handleOK(canvas2);
+    };
 
     const style = `
       .m-signature-pad{
@@ -158,7 +182,12 @@ const MainScreen = (props) => {
 
     return (
       <View style={{ flex: 1 }}>
-
+        <Image
+          download
+          source={{
+            uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+          }}
+        />
         <Signature
           ref={ref}
           bgSrc={example}
@@ -177,7 +206,7 @@ const MainScreen = (props) => {
           <Button title="Erase" onPress={handleErase} />
           <Button title="Undo" onPress={handleUndo} />
           <Button title="Redo" onPress={handleRedo} />
-          <Button title="Clear" onPress={handleClear} />
+          <Button title="Confirm" onPress={handleConfirm} />
           <Button title="Big" onPress={handlePenSizeBig} />
           <Button title="Middle" onPress={handlePenSizeMid} />
           <Button title="Small" onPress={handlePenSizeSm} />
@@ -190,6 +219,7 @@ const MainScreen = (props) => {
           <TouchableOpacity style={{ backgroundColor: "green", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorGreen} />
           <TouchableOpacity style={{ backgroundColor: "blue", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorBlue} />
           <TouchableOpacity style={{ backgroundColor: "purple", borderRadius: 50, width: 100, height: 100 }} onPress={handleColorPurple} />
+
         </View>
       </View>
     );
@@ -199,14 +229,22 @@ const MainScreen = (props) => {
     const ref = useRef();
 
     const handleOK = async (signature) => {
-      console.log(signature);
-      const base64Code = signature.split("data:image/png;base64,")[1];
-      const filename = FileSystem.documentDirectory + "some_unique_file_name.png";
-      await FileSystem.writeAsStringAsync(filename, base64Code, {
-        encoding: FileSystem.EncodingType.Base64,
+      // console.log(signature);
+      // const base64Code = signature.split("data:image/png;base64,")[1];
+      // const filename = FileSystem.documentDirectory + "some_unique_file_name.png";
+      // await FileSystem.writeAsStringAsync(filename, base64Code, {
+      //   encoding: FileSystem.EncodingType.Base64,
+      // });
+
+      // const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+
+      AsyncStorage.setItem('test_id', signature, () => { //test_id변수로 signature (base64) 저장
+        console.log('이미지 id저장')
       });
 
-      const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+      AsyncStorage.getItem('test', (err, result) => { //test_id에 담긴 아이디 불러오기
+        console.log(result); // result에 담김 //불러온거 출력
+      });
 
     };
 
@@ -232,15 +270,15 @@ const MainScreen = (props) => {
       ref.current.clearSignature();
     };
     const handlePenSizeBig = () => {
-      ref.current.changePenSize(1, 10)
+      ref.current.changePenSize(10, 10)
       //ref.current.clearSignature();
     };
     const handlePenSizeMid = () => {
-      ref.current.changePenSize(1, 5)
+      ref.current.changePenSize(5, 5)
       //ref.current.clearSignature();
     };
     const handlePenSizeSm = () => {
-      ref.current.changePenSize(1, 3)
+      ref.current.changePenSize(3, 3)
       //ref.current.clearSignature();
     };
     const handleColorRed = () => {
@@ -268,6 +306,13 @@ const MainScreen = (props) => {
       ref.current.changePenSize(20, 40);
     }
 
+    /*테스트*/
+    const handleConfirm = () => {
+      console.log("end");
+      const canvas2 = ref.current.readSignature();
+      handleOK(canvas2);
+    };
+
     const style = `
     .m-signature-pad{
       height: 380%;
@@ -294,7 +339,7 @@ const MainScreen = (props) => {
             <Button title="Erase" onPress={handleErase} />
             <Button title="Undo" onPress={handleUndo} />
             <Button title="Redo" onPress={handleRedo} />
-            <Button title="Clear" onPress={handleClear} />
+            <Button title="Confirm" onPress={handleConfirm} />
             <Button title="Big" onPress={handlePenSizeBig} />
             <Button title="Middle" onPress={handlePenSizeMid} />
             <Button title="Small" onPress={handlePenSizeSm} />
